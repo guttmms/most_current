@@ -1,0 +1,18 @@
+<%= form_for @profile do |f| %>
+  <%= f.error_messages %>
+  <p>
+    <%= f.label :first_name, "first name" %><br />
+    <%= f.text_field :first_name %>
+  </p>
+  <p>
+   	<%= f.label :last_name, "last name" %><br />
+    <%= f.text_field :last_name %>
+  </p>
+  <p>
+   	<%= f.label :industry, "industry" %><br />
+    <%= f.text_field :industry %>
+  <p>
+    <%= f.label :location, "location" %><br />
+    <%= f.text_field :location %>  </p>
+  <p><%= f.submit ("Update") %></p>
+<% end %>

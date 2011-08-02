@@ -1,4 +1,8 @@
 SearchApp::Application.routes.draw do
+  
+  match '/auth/:provider/callback' => 'authentications#create'
+  resources :authentications
+
   match 'user/edit' => 'users#edit', :as => :edit_current_user
 
   match 'signup' => 'users#new', :as => :signup
@@ -7,9 +11,11 @@ SearchApp::Application.routes.draw do
 
   match 'login' => 'sessions#new', :as => :login
   root :to => 'sessions#new'
-  resources :sessions
+  #resources :registrations
+  resources :sessions, :controllers => {:registrations => 'registrations'}
   resources :friendships
-  resources :users
+  resources :users #, :controllers => {:registrations => 'registrations'}
+  resources :profiles
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

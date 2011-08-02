@@ -1,6 +1,11 @@
 source 'http://rubygems.org'
 
 gem 'rails', '3.0.9'
+gem "linkedin", "~> 0.2.2"
+gem 'omniauth', '0.2.0'
+gem 'oauth'
+gem 'json'
+gem 'ruby-debug19'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'

@@ -2,15 +2,72 @@
 <p>Username: <%= @user.username%></p>
 <p><%= link_to "Find friends", users_path%>
 <h2> Profile </h2>
-<%= link_to "Edit Profile", '#' %>
+<%= link_to "Edit Profile", edit_profile_path(@user.profile) %>
 <ul>
 <p>Name:</p>
 <%= "#{@user.profile.first_name} #{@user.profile.last_name}"%>
-<p> Location:</p>
-<p><%= @user.profile.location%> 
-	<%%></p>
 <p>Industry</p>
 <p><%= @user.profile.industry%></p>
+<p> Location:</p>
+<p><%= @user.profile.location%> </p>
+
+
+<p>Forward Table</p>
+<% forward_table = @user.forward_table%>
+<ul>
+<% for forward_key in forward_table.forward_keys%>
+	<% keyword = Key.find(forward_key.key_id)%>
+	<!--<%= debug keyword%>-->
+	<% prop_messages = forward_key.prop_messages%>
+	<li><%= "#{keyword.keyword}::=:: "%></li>
+	<% for prop_message in prop_messages%>
+	    <!--<%= debug prop_message%>-->
+	   <%friend = LinkedContact.where(:uid => prop_message.pid)[0]%>
+       <li><%= "#{friend.first_name} #{friend.last_name}" %></li>
+   <%end%> 
+<%end%>
+</ul>
+<!--test to show information stored in connections table-->
+<!-- <p> TEST</p>
+
+<ul>
+<% for contact in @user.linked_contacts%>
+<li>
+<%= "#{contact.first_name} #{contact.last_name}"%>
+ <%="#{contact.headline} #{contact.uid} #{contact.location} #{contact.industry}"%>
+</li>
+<%end%>
+</ul>
+-->
+<p>Received Table</p>
+<ul>
+	<%@user.received_table.received_keys.each do |received_key|%>
+	<%keyword = Key.find(received_key.key_id)%>
+	<li><%= "#{keyword.keyword} #{received_key.max_hops} " %>
+		<% received_key.friend_min_hops.each do |friend_min_hop|%>
+		<%friendo = User.find(friend_min_hop.friend_id)%>
+		<%= "#{friendo.username} #{friend_min_hop.h_min}"%></li>
+	
+		<%end%>
+		<%end%>
+</ul>
+<p>Another Test</p>
+<ul>
+<%for key in @user.keys%>
+  
+	<li>
+	<%= "#{key.keyword} #{key.user_id} ::::"%>	
+	
+	<%contact_keys = ContactKey.where(:key_id => key)%>
+	<%for contact_key in contact_keys%>
+		<%connection = LinkedContact.find(contact_key.contact_id)%>
+
+		<%= "#{connection.first_name} #{connection.last_name} ---"%>
+	<%end%>
+	</li>
+<%end%>
+</ul>
+
 <h3> Your friends </h3>
 <ul>
 	<% for friendship in @user.friendships %>
@@ -19,4 +76,4 @@
 	(<%= link_to "remove", friendship, :method => :delete%>)
 	</li>
 	<% end %>
-</ul>
+</ul> 

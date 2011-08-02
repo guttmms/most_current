@@ -1,3 +1,4 @@
+
 class UsersController < ApplicationController
   before_filter :login_required, :except => [:new, :create]
 
@@ -16,12 +17,13 @@ class UsersController < ApplicationController
       render :action => 'new'
     end
   end
-
+ 
   def edit
     @user = current_user
   end
   def show
     @user = User.find(params[:id])
+    
   end
 
   def update
