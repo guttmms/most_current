@@ -1,4 +1,5 @@
 class User < ActiveRecord::Base
+  has_one :qid_table, :dependent => :destroy
   has_many :message_users
   has_many :prop_messages, :through => :message_users
   has_one :received_table, :dependent => :destroy
@@ -27,8 +28,106 @@ class User < ActiveRecord::Base
   validates_presence_of :password, :on => :create
   validates_confirmation_of :password
   validates_length_of :password, :minimum => 4, :allow_blank => true
+  @@results 
   
-  def query_message_process
+  def find_target(keyword)
+    
+    targets = linked_contacts.includes(:contact_keys).where("contact_keys.key_id" => keyword.id)
+    
+    #debugger
+    return targets
+  end
+  
+  def start_query(search)
+    search.downcase!
+    query_keys =  search.split(' ')
+    qid = (1..8).collect { (i = Kernel.rand(62); i += ((i < 10) ? 48 : ((i < 36) ? 55 : 61 ))).chr }.join
+    q = Qid.new(:qid => qid)
+    q.save
+    hops_done = 0
+    hops_left = 10
+    origin_id = self.id
+    query_message = [q, query_keys, hops_done, hops_left, origin_id]
+    
+    friendships.map {|obj| obj.user }
+    
+    friendships.map(&:friend_id).each do |friend_id|
+      friend = User.find(friend_id)
+      #received_keys_query_keys = []
+      relevant_keys =  Key.joins(:received_keys => :friend_min_hops).where("received_keys.key_id" => received_table.received_keys.map(&:key_id))
+      
+      query_keys.each do |query_key| 
+        #received_keys_query_keys = received_keys_query_keys + received_table.received_keys.joins(:key).where(:conditions => ['keyword LIKE ?', "%#{query_keys}%"]) #received_table.received_keys.includes(:keys).where(:received_key_id => {})
+        relevant_keys = relevant_keys.where('keyword LIKE ?', "%#{query_key}%")
+      end
+      friend_forwarded_key = relevant_keys.where("friend_min_hops.friend_id" => friend_id)
+      @@results = []
+      
+      if !friend_forwarded_key.empty?
+        friend.query_process(query_message, self.id)
+      end
+      
+      return @@results
+      
+    end  
+  end
+  def success(targets, oid, chain, parent_id)
+    
+      if self.id == oid
+        
+        result = [targets, chain]
+        
+        @@results << result
+        
+      else
+        chain << self
+        parent = User.find(parent_id)
+        parent.success(targets, oid, chain, @parent_id)
+       end 
+    
+  end
+  def query_process(message, parent_id)
+    @parent_id = parent_id
+    qid = message[0]
+    qk = message[1]
+    hd = message[2]
+    hl = message[3]
+    oid = message[4]
+    
+    if !qid_table.qid_table_qids.where(:qid_id => qid.id).nil?
+      q = qid_table.qid_table_qids.build(:qid_id => qid.id)
+      similar_keys = []
+      qk.each do |query_key|
+        similar_keys = similar_keys + keys.where('keyword LIKE ?', "%#{query_key}%")
+        if !similar_keys.empty?
+          targets = []
+          
+          similar_keys.each do |k|
+            targets = targets + find_target(k)
+            chain = []
+            success(targets, oid, [], parent_id)
+          end
+        end
+      end
+    end
+    
+    if hl > 0
+      friendships.each do |friend|
+        if friend.id != parent_id && friend.id != oid
+          received_keys_query_keys = []
+          query_keys.each do |query_key|
+            received_keys_query_keys = received_keys_query_keys + received_table.received_keys.find(:all, :conditions => ['keyword LIKE ?', "%#{query_key}%"])
+          end
+          friend_forwarded_key = received_keys_query_keys.friend_min_hops.where(:user_id => friend.id)
+            if !friend_forwarded_key.empty?
+              query_message = [qid, qk, hd + 1, hl -1, oid]
+              friend.query_process(query_message, self.id)
+            end
+        end
+      end
+      
+    end
+    
   end
    
   def prop_process(keyword, message, parent_id)
@@ -57,7 +156,7 @@ class User < ActiveRecord::Base
         
         friendlist = friendships
         friendlist.each do |friend|
-          if !friend.nil? && friend.id != parent_id
+          if !friend.nil? && friend.id != parent_id && friend.id != oid
             if hr > 1
               incremented_message = [pid, hr -1, hc +1, oid]
               message_user = stored_message.message_users.build(:user_id => friend.id)
@@ -72,7 +171,7 @@ class User < ActiveRecord::Base
       friendlist = friendships
       
       friendlist.each do |friend|
-        if !friend.nil? && friend.id != parent_id 
+        if !friend.nil? && friend.id != parent_id && friend.id != oid
           
          message_users_corresponding_to_friend = key_in_forward_table.prop_messages.message_users.where(:user_id => friend.id)
         
@@ -128,7 +227,7 @@ class User < ActiveRecord::Base
       
       friendlist = friendships
       friendlist.each do |friend|
-        if !friend.nil? && friend.id != parent_id
+        if !friend.nil? && friend.id != parent_id && friend.id != oid
           if hr > 1
             message_user = prop_message.message_users.build(:user_id => friend.id)
             message_user.save
@@ -152,7 +251,7 @@ class User < ActiveRecord::Base
   def build_connections(connectionsArray)
     connectionsArray["values"].each do |connect|
       unless connect["id"] == "private"
-     @contact = self.linked_contacts.build(
+     contact = self.linked_contacts.build(
                         :user_id => self.id, 
                         :headline => connect["headline"], 
                         :uid => connect["id"],
@@ -162,8 +261,8 @@ class User < ActiveRecord::Base
                         :industry => connect['industry'],
                         :first_name => connect['firstName']
                         )
-     @contact.save
-     add_keyword(@contact)
+     contact.save
+     add_keyword(contact)
       end
     end 
   end  
@@ -181,11 +280,11 @@ class User < ActiveRecord::Base
                              :keyword => key
                              )
          key_instance.save
-         contact_key = key_instance.contact_keys.build(:contact_id => contact.id)
+         contact_key = key_instance.contact_keys.build(:linked_contact_id => contact.id)
          contact_key.save
       else
         key_instance = existing_key
-        contact_key = key_instance.contact_keys.build(:contact_id => contact.id)
+        contact_key = key_instance.contact_keys.build(:linked_contact_id => contact.id)
         contact_key.save 
       end
     end
@@ -210,6 +309,8 @@ class User < ActiveRecord::Base
    forward_table.save
    received_table = ReceivedTable.new(:user_id => self.id)
    received_table.save
+   qid_table = QidTable.new(:user_id => self.id)
+   qid_table.save
   end
   # login can be either username or email address
   def self.authenticate(login, pass)

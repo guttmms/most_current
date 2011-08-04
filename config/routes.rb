@@ -2,9 +2,10 @@ SearchApp::Application.routes.draw do
   
   match '/auth/:provider/callback' => 'authentications#create'
   resources :authentications
-
+  match 'search/index' => 'search#index', :as => :search_index
+  resources :search
   match 'user/edit' => 'users#edit', :as => :edit_current_user
-
+  match 'user/search' => 'users#search', :as => :user_search
   match 'signup' => 'users#new', :as => :signup
 
   match 'logout' => 'sessions#destroy', :as => :logout

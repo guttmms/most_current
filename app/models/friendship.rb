@@ -15,7 +15,7 @@ class Friendship < ActiveRecord::Base
     keys.each do |key|
       contact_keys = key.contact_keys
       contact_keys.each do |contact_key|
-        pid = LinkedContact.find(contact_key.contact_id).uid
+        pid = LinkedContact.find(contact_key.linked_contact_id).uid
         hr = 10
         hc = 0
         oid = user.id

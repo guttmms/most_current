@@ -1,7 +1,15 @@
 
 class UsersController < ApplicationController
   before_filter :login_required, :except => [:new, :create]
-
+  def search
+    if params[:keywords]
+    #@user = current_user
+    @results = []
+    @results = current_user.start_query(params[:keywords])
+    debugger 
+  end
+  end
+  
   def new
     @user = User.new
   end

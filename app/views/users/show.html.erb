@@ -2,15 +2,15 @@
 <p>Username: <%= @user.username%></p>
 <p><%= link_to "Find friends", users_path%>
 <h2> Profile </h2>
-<%= link_to "Edit Profile", edit_profile_path(@user.profile) %>
+<%= link_to "Search", user_search_path %>
 <ul>
-<p>Name:</p>
+<!--<p>Name:</p>
 <%= "#{@user.profile.first_name} #{@user.profile.last_name}"%>
 <p>Industry</p>
 <p><%= @user.profile.industry%></p>
 <p> Location:</p>
 <p><%= @user.profile.location%> </p>
-
+-->
 
 <p>Forward Table</p>
 <% forward_table = @user.forward_table%>
@@ -60,7 +60,7 @@
 	
 	<%contact_keys = ContactKey.where(:key_id => key)%>
 	<%for contact_key in contact_keys%>
-		<%connection = LinkedContact.find(contact_key.contact_id)%>
+		<%connection = LinkedContact.find(contact_key.linked_contact_id)%>
 
 		<%= "#{connection.first_name} #{connection.last_name} ---"%>
 	<%end%>

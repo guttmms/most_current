@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110801204403) do
+ActiveRecord::Schema.define(:version => 20110804162421) do
 
   create_table "authentications", :force => true do |t|
     t.integer  "user_id"
@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(:version => 20110801204403) do
 
   create_table "contact_keys", :force => true do |t|
     t.integer  "key_id"
-    t.integer  "contact_id"
+    t.integer  "linked_contact_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -102,6 +102,25 @@ ActiveRecord::Schema.define(:version => 20110801204403) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "origin_id"
+  end
+
+  create_table "qid_table_qids", :force => true do |t|
+    t.integer  "qid_table_id"
+    t.integer  "qid_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "qid_tables", :force => true do |t|
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "qids", :force => true do |t|
+    t.string   "qid"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "received_keys", :force => true do |t|
