@@ -1,4 +1,5 @@
 class Friendship < ActiveRecord::Base
+  #Gmail credentials = clareodower@gmail.com, codakk
   belongs_to :user
   belongs_to :friend, :class_name => 'User'
   
@@ -25,7 +26,7 @@ class Friendship < ActiveRecord::Base
           logger.debug "!!!!!!!!!!!!!!!!!forward message to #{friend.username} unless #{pid} = #{friend.authentications.where(:provider => 'linked_in')[0].uid} or  #{friend.username} doesn't have this linked contact is  false => (#{friend.linked_contacts.where(:uid => pid).empty?}) "
           logger.debug "!!!!!!!!!!!!!!!!!!!!!!!#{key.keyword}"
           
-          
+          #debugger
           friend.prop_process(key, message, user.id)
         end
         

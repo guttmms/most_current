@@ -1,0 +1,5 @@
+<%= form_tag :controller => "users", :action => 'search', :method => 'get' do%>
+<%= label_tag :keywords, "Search for:" %>
+<%= text_field_tag :keywords%>
+<%= submit_tag ("Search")%>
+<%end%>

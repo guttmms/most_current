@@ -1,0 +1,27 @@
+<% title "Search" %>
+<%= render :partial => "form1"%>
+<%unless @results.nil?%>
+<% @results.each do |result|%>
+<ul>
+	  <% targets = result[0]%>
+	  <% chain = result[1]%>
+	<li>
+	     Found
+		<%targets.each do |target|%>
+		
+		<%= " #{target.first_name} #{target.last_name}, "%>
+	    <%end%>
+	   	<%chain.each do |link|%>
+		<%="Through : #{link.username} "%>
+		<%end%>
+	    
+	</li>
+	
+</ul>
+<%end%>
+<%end%>
+
+<!--
+-->
+
+

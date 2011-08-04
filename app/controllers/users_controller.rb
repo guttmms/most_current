@@ -4,7 +4,7 @@ class UsersController < ApplicationController
   def search
     if params[:keywords]
     #@user = current_user
-    @results = []
+    #@results = []
     @results = current_user.start_query(params[:keywords])
     debugger 
   end
