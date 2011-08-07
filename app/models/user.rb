@@ -64,6 +64,7 @@ class User < ActiveRecord::Base
       @@results = []
       
       if !friend_forwarded_key.empty?
+        
         friend.query_process(query_message, self.id)
       end
       
@@ -103,10 +104,12 @@ class User < ActiveRecord::Base
           targets = []
           
           similar_keys.each do |k|
-            targets = targets + find_target(k)
+            targets = targets + find_target(k) #+ targets
             chain = []
-            success(targets, oid, [], parent_id)
+            #debugger
+            
           end
+          success(targets, oid, [], parent_id)
         end
       end
     end
@@ -154,8 +157,9 @@ class User < ActiveRecord::Base
         friend_min_hops.update_search_info(hc)
         #
         
-        friendlist = friendships
-        friendlist.each do |friend|
+        
+        friendships.each do |friendship|
+          friend = User.find(friendship.friend_id)
           if !friend.nil? && friend.id != parent_id && friend.id != oid
             if hr > 1
               incremented_message = [pid, hr -1, hc +1, oid]
@@ -167,12 +171,13 @@ class User < ActiveRecord::Base
         end 
      end
       
+      debugger
     elsif !key_in_forward_table.nil? && keys_messages.where(:pid => pid).empty?
-      friendlist = friendships
       
-      friendlist.each do |friend|
+      friendships.each do |friendship|
+        friend = User.find(friendship.friend_id)
         if !friend.nil? && friend.id != parent_id && friend.id != oid
-          
+          debugger
          message_users_corresponding_to_friend = key_in_forward_table.prop_messages.message_users.where(:user_id => friend.id)
         
          message_users_corresponding_to_friend.each do |message_user|
@@ -225,8 +230,9 @@ class User < ActiveRecord::Base
         friend_min_hops.update_search_info(hc)
       end
       
-      friendlist = friendships
-      friendlist.each do |friend|
+      
+      friendships.each do |friendship|
+        friend = User.find(friendship.friend_id)
         if !friend.nil? && friend.id != parent_id && friend.id != oid
           if hr > 1
             message_user = prop_message.message_users.build(:user_id => friend.id)
@@ -234,6 +240,7 @@ class User < ActiveRecord::Base
             
             incremented_message = [pid, hr-1, hc+1, oid]#PropMessage.new(:pid => message.pid, :hops_remaining => message.hops_remaining, :hops_covered => message.hops_covered)
             #incremented_message.save
+            
             friend.prop_process(keyword, incremented_message, self.id)
           end
         end

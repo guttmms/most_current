@@ -6,7 +6,7 @@ class UsersController < ApplicationController
     #@user = current_user
     #@results = []
     @results = current_user.start_query(params[:keywords])
-    debugger 
+    
   end
   end
   

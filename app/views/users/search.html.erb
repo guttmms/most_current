@@ -6,13 +6,14 @@
 	  <% targets = result[0]%>
 	  <% chain = result[1]%>
 	<li>
-	     Found
+	     <strong>Found</strong>
 		<%targets.each do |target|%>
 		
 		<%= " #{target.first_name} #{target.last_name}, "%>
 	    <%end%>
 	   	<%chain.each do |link|%>
-		<%="Through : #{link.username} "%>
+	<strong> Through: </strong>
+		<%= "#{link.username} "%>
 		<%end%>
 	    
 	</li>
