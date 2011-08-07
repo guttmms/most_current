@@ -11,7 +11,6 @@ gem 'ruby-debug19'
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 gem 'nifty-generators'
 
-gem "pg", :group => :production
 gem 'sqlite3-ruby', :group => :development
 
 
