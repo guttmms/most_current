@@ -40,8 +40,14 @@ GEM
       addressable (~> 2.2.4)
       multipart-post (~> 1.1.0)
       rack (< 2, >= 1.1.0)
+    heroku (2.4.0)
+      launchy (>= 0.3.2)
+      rest-client (~> 1.6.1)
+      term-ansicolor (~> 1.0.5)
     i18n (0.5.0)
     json (1.5.3)
+    launchy (2.0.5)
+      addressable (~> 2.2.6)
     linecache19 (0.5.12)
       ruby_core_source (>= 0.1.4)
     linkedin (0.2.2)
@@ -142,6 +148,7 @@ GEM
     sqlite3 (1.3.4)
     sqlite3-ruby (1.3.3)
       sqlite3 (>= 1.3.3)
+    term-ansicolor (1.0.6)
     thor (0.14.6)
     treetop (1.4.10)
       polyglot
@@ -153,6 +160,7 @@ PLATFORMS
 
 DEPENDENCIES
   bcrypt-ruby
+  heroku
   json
   linkedin (~> 0.2.2)
   mocha
